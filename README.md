@@ -15,6 +15,7 @@ The project demonstrates modern backend development practices including:
 - SQL Server
 - Tests: xUnit + Moq + FluentAssertions
 - Integration Tests
+- API Versioning
 
 ## Architecture
 
