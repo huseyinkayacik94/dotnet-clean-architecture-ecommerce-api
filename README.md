@@ -14,6 +14,7 @@ The project demonstrates modern backend development practices including:
 - Docker
 - SQL Server
 - Tests: xUnit + Moq + FluentAssertions
+- Integration Tests
 
 ## Architecture
 
