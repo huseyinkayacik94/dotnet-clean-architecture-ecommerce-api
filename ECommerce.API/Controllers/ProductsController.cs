@@ -3,10 +3,12 @@ using ECommerce.Application.Features.Products.Commands;
 using ECommerce.Application.Features.Products.Queries;
 using ECommerce.Application.Services;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase

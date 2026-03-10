@@ -1,51 +1,51 @@
-﻿using ECommerce.Application.Common.Models;
+﻿using ECommerce.Application.Common.Caching;
 using ECommerce.Application.Features.Products.Queries;
 using ECommerce.Application.Interfaces;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ECommerce.Application.Features.Products.Handlers
+public class GetProductsQueryHandler
+    : IRequestHandler<GetProductsQuery, List<ProductDto>>
 {
-    public class GetProductsQueryHandler
-    : IRequestHandler<GetProductsQuery, PagedResult<ProductDto>>
+    private readonly IProductRepository _repository;
+    private readonly RedisCacheService _cache;
+
+    public GetProductsQueryHandler(
+        IProductRepository repository,
+        RedisCacheService cache)
     {
-        private readonly IProductRepository _productRepository;
+        _repository = repository;
+        _cache = cache;
+    }
 
-        public GetProductsQueryHandler(IProductRepository productRepository)
+    public async Task<List<ProductDto>> Handle(
+        GetProductsQuery request,
+        CancellationToken cancellationToken)
+    {
+        var cacheKey = $"products_page_{request.Page}_{request.PageSize}";
+
+        var cached = await _cache.GetAsync<List<ProductDto>>(cacheKey);
+
+        if (cached != null)
         {
-            _productRepository = productRepository;
+            Console.WriteLine("CACHE HIT - Redis");
+            return cached;
         }
 
-        public async Task<PagedResult<ProductDto>> Handle(
-            GetProductsQuery request,
-            CancellationToken cancellationToken)
+        Console.WriteLine("CACHE MISS - DB");
+
+        var products = await _repository.GetPagedAsync(
+            request.Page,
+            request.PageSize);
+
+        var result = products.Select(p => new ProductDto
         {
-            var products = await _productRepository.GetAllAsync();
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price
+        }).ToList();
 
-            var totalCount = products.Count;
+        await _cache.SetAsync(cacheKey, result);
 
-            var items = products
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .Select(p => new ProductDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price
-                })
-                .ToList();
-
-            return new PagedResult<ProductDto>
-            {
-                Page = request.Page,
-                PageSize = request.PageSize,
-                TotalCount = totalCount,
-                Items = items
-            };
-        }
+        return result;
     }
 }

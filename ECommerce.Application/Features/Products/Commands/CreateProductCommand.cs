@@ -10,6 +10,6 @@ namespace ECommerce.Application.Features.Products.Commands
     public class CreateProductCommand : IRequest<Guid>
     {
         public string Name { get; set; }
-        public decimal Price { get; set; }
+        public decimal Price { get; set; } = 0;
     }
 }

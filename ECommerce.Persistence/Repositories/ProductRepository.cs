@@ -36,6 +36,14 @@ namespace ECommerce.Persistence.Repositories
             return await _context.Products.ToListAsync();
         }
 
+        public async Task<List<Product>> GetPagedAsync(int page, int pageSize)
+        {
+            return await _context.Products
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

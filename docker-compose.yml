@@ -1,32 +1,30 @@
-version: '3.9'
-
 services:
-  sql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: ecommerce-sql
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong!Pass123
-    ports:
-      - "1433:1433"
-    networks:
-      - ecommerce-network
 
-  api:
+  ecommerce-api:
     build:
       context: .
       dockerfile: ECommerce.API/Dockerfile
     container_name: ecommerce-api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=ecommerce-sql,1433;Database=ECommerceDb;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True;Encrypt=False;
     ports:
       - "5000:8080"
     depends_on:
-      - sql
-    networks:
-      - ecommerce-network
+      - ecommerce-sql
+      - redis
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=ecommerce-sql,1433;Database=ECommerceDb;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True;
+      - Redis__Connection=redis:6379
 
-networks:
-  ecommerce-network:
-    driver: bridge
+  ecommerce-sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ecommerce-sql
+    environment:
+      SA_PASSWORD: "YourStrong!Pass123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+
+  redis:
+    image: redis:7
+    container_name: ecommerce-redis
+    ports:
+      - "6379:6379"

@@ -13,5 +13,7 @@ namespace ECommerce.Application.Interfaces
         Task<Product?> GetByIdAsync(Guid id);
         Task SaveChangesAsync();
         Task<List<Product>> GetAllAsync();
+
+        Task<List<Product>> GetPagedAsync(int page, int pageSize);
     }
 }
