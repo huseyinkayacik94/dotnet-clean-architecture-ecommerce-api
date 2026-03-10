@@ -13,6 +13,7 @@ The project demonstrates modern backend development practices including:
 - Pagination
 - Docker
 - SQL Server
+- Tests: xUnit + Moq + FluentAssertions
 
 ## Architecture
 
