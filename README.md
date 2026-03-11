@@ -18,6 +18,7 @@ The project demonstrates modern backend development practices including:
 - API Versioning
 - Health Checks
 - Rate Limiting
+- Serilog Logging
 
 ## Architecture
 
