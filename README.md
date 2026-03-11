@@ -17,6 +17,7 @@ The project demonstrates modern backend development practices including:
 - Integration Tests
 - API Versioning
 - Health Checks
+- Rate Limiting
 
 ## Architecture
 
