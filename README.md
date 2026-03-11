@@ -16,6 +16,7 @@ The project demonstrates modern backend development practices including:
 - Tests: xUnit + Moq + FluentAssertions
 - Integration Tests
 - API Versioning
+- Health Checks
 
 ## Architecture
 
