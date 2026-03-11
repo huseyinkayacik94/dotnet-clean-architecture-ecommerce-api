@@ -44,7 +44,10 @@ public class GetProductsQueryHandler
             Price = p.Price
         }).ToList();
 
-        await _cache.SetAsync(cacheKey, result);
+        if (_cache != null)
+        {
+            await _cache.SetAsync(cacheKey, products);
+        }
 
         return result;
     }

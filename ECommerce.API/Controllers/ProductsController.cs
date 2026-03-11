@@ -1,16 +1,19 @@
-﻿using ECommerce.Application.DTOs;
+﻿using Asp.Versioning;
+using ECommerce.Application.DTOs;
 using ECommerce.Application.Features.Products.Commands;
 using ECommerce.Application.Features.Products.Queries;
 using ECommerce.Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ECommerce.API.Controllers
 {
-    [Authorize]
+    [EnableRateLimiting("api")]
+    [ApiVersion("1.0")]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ProductsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -37,6 +40,19 @@ namespace ECommerce.API.Controllers
             {
                 Page = page,
                 PageSize = pageSize
+            };
+
+            var result = await _mediator.Send(query);
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var query = new GetProductByIdQuery
+            {
+                Id = id
             };
 
             var result = await _mediator.Send(query);

@@ -36,5 +36,10 @@ namespace ECommerce.Application.Common.Caching
                 json,
                 TimeSpan.FromMinutes(minutes));
         }
+
+        public async Task RemoveAsync(string key)
+        {
+            await _cache.KeyDeleteAsync(key);
+        }
     }
 }
