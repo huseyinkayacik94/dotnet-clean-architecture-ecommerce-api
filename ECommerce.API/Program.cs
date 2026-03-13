@@ -1,4 +1,3 @@
-using Serilog;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using ECommerce.API.Middlewares;
@@ -18,6 +17,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using StackExchange.Redis;
 using System.Text;
 using System.Threading.RateLimiting;
@@ -72,6 +72,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ProductService>();
 
+builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
+
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>();
 
 builder.Services.AddMediatR(cfg =>
@@ -89,6 +91,10 @@ builder.Services.AddTransient(
     typeof(IPipelineBehavior<,>),
     typeof(ValidationBehavior<,>)
 );
+
+builder.Services.AddTransient(
+    typeof(IPipelineBehavior<,>),
+    typeof(CachingBehavior<,>));
 
 //builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 //{
@@ -204,7 +210,30 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Host.UseSerilog();
 
+builder.Services.AddSingleton<RabbitMQPublisher>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ECommerceDbContext>();
+
+    var retries = 10;
+
+    while (retries > 0)
+    {
+        try
+        {
+            db.Database.Migrate();
+            break;
+        }
+        catch
+        {
+            retries--;
+            Thread.Sleep(5000);
+        }
+    }
+}
 
 app.UseSwagger();
 
@@ -231,27 +260,6 @@ app.UseRateLimiter();
 app.MapControllers();
 
 app.MapHealthChecks("/health");
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ECommerceDbContext>();
-
-    var retries = 10;
-
-    while (retries > 0)
-    {
-        try
-        {
-            db.Database.Migrate();
-            break;
-        }
-        catch
-        {
-            retries--;
-            Thread.Sleep(5000);
-        }
-    }
-}
 
 app.Run();
 

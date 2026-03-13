@@ -20,6 +20,10 @@ namespace ECommerce.Persistence.Context
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
+
+        public DbSet<InboxMessage> InboxMessages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>()

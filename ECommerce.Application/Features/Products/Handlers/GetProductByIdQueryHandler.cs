@@ -27,19 +27,20 @@ namespace ECommerce.Application.Features.Products.Handlers
 
         public async Task<ProductDto> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
         {
-            var cacheKey = $"product:{request.Id}";
+            //var cacheKey = $"product:{request.Id}";
 
-            var cachedProduct = await _cache.GetAsync<ProductDto>(cacheKey);
+            //var cachedProduct = await _cache.GetAsync<ProductDto>(cacheKey);
 
-            if (cachedProduct != null)
-            {
-                Console.WriteLine("CACHE HIT → Redis");
-                return cachedProduct;
-            }
+            //if (cachedProduct != null)
+            //{
+            //    Console.WriteLine("CACHE HIT → Redis");
+            //    return cachedProduct;
+            //}
 
-            Console.WriteLine("CACHE MISS → DB");
+            //Console.WriteLine("CACHE MISS → DB");
 
             var product = await _repository.GetByIdAsync(request.Id);
+            
             if (product == null)
                 return null;
 
@@ -48,7 +49,7 @@ namespace ECommerce.Application.Features.Products.Handlers
             productDto.Name = product.Name;
             productDto.Price = product.Price;
 
-            await _cache.SetAsync(cacheKey, product, 5);
+            //await _cache.SetAsync(cacheKey, product, 5);
 
             return productDto;
         }

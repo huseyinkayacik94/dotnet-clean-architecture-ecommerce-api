@@ -32,7 +32,7 @@ namespace ECommerce.Tests
             };
 
             var handler = new CreateProductCommandHandler(
-                _productRepositoryMock.Object
+                _productRepositoryMock.Object, null
             );
 
             // Act
