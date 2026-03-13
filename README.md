@@ -19,6 +19,9 @@ The project demonstrates modern backend development practices including:
 - Health Checks
 - Rate Limiting
 - Serilog Logging
+- RabbitMQ
+- Outbox Pattern
+- Worker Service
 
 ## Architecture
 
